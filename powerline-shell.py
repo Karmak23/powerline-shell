@@ -95,7 +95,7 @@ class Powerline:
 
 class Segment:
     def __init__(self, powerline, content, fg, bg, separator=None,
-            separator_fg=None):
+                 separator_fg=None):
         self.powerline = powerline
         self.content = content
         self.fg = fg
@@ -137,9 +137,10 @@ def add_cwd_segment(powerline, cwd, maxdepth, cwd_only=False):
     if not cwd_only:
         for n in names[:-1]:
             powerline.append(Segment(powerline, ' %s ' % n, Color.PATH_FG,
-                Color.PATH_BG, powerline.separator_thin, Color.SEPARATOR_FG))
+                             Color.PATH_BG, powerline.separator_thin,
+                             Color.SEPARATOR_FG))
     powerline.append(Segment(powerline, ' %s ' % names[-1], Color.CWD_FG,
-        Color.PATH_BG))
+                     Color.PATH_BG))
 
 
 def get_hg_status():
@@ -147,7 +148,7 @@ def get_hg_status():
     has_untracked_files = False
     has_missing_files = False
     output = subprocess.Popen(['hg', 'status'],
-            stdout=subprocess.PIPE).communicate()[0]
+                              stdout=subprocess.PIPE).communicate()[0]
     for line in output.split('\n'):
         if line == '':
             continue
@@ -185,7 +186,7 @@ def get_git_status():
     has_untracked_files = False
     origin_position = ""
     output = subprocess.Popen(['git', 'status', '--ignore-submodules'],
-            stdout=subprocess.PIPE).communicate()[0]
+                              stdout=subprocess.PIPE).communicate()[0]
     for line in output.split('\n'):
         origin_status = re.findall(
                 r"Your branch is (ahead|behind).*?(\d+) comm", line)
@@ -205,8 +206,10 @@ def get_git_status():
 
 def add_git_segment(powerline, cwd):
     #cmd = "git branch 2> /dev/null | grep -e '\\*'"
-    p1 = subprocess.Popen(['git', 'branch'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p2 = subprocess.Popen(['grep', '-e', '\\*'], stdin=p1.stdout, stdout=subprocess.PIPE)
+    p1 = subprocess.Popen(['git', 'branch'], stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
+    p2 = subprocess.Popen(['grep', '-e', '\\*'], stdin=p1.stdout,
+                          stdout=subprocess.PIPE)
     output = p2.communicate()[0].strip()
     if not output:
         return False
@@ -228,7 +231,8 @@ def add_git_segment(powerline, cwd):
 
 
 def add_svn_segment(powerline, cwd):
-    is_svn = subprocess.Popen(['svn', 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    is_svn = subprocess.Popen(['svn', 'status'], stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
     is_svn_output = is_svn.communicate()[1].strip()
     if len(is_svn_output) != 0:
         return
@@ -251,14 +255,14 @@ def add_svn_segment(powerline, cwd):
     try:
         #cmd = '"svn status | grep -c "^[ACDIMRX\\!\\~]"'
         p1 = subprocess.Popen(['svn', 'status'], stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+                              stderr=subprocess.PIPE)
         p2 = subprocess.Popen(['grep', '-c', '^[ACDIMR\\!\\~]'],
-                stdin=p1.stdout, stdout=subprocess.PIPE)
+                              stdin=p1.stdout, stdout=subprocess.PIPE)
         output = p2.communicate()[0].strip()
         if len(output) > 0 and int(output) > 0:
             changes = output.strip()
             powerline.append(Segment(powerline, ' %s ' % changes,
-                Color.SVN_CHANGES_FG, Color.SVN_CHANGES_BG))
+                             Color.SVN_CHANGES_FG, Color.SVN_CHANGES_BG))
     except OSError:
         return False
     except subprocess.CalledProcessError:
@@ -334,7 +338,7 @@ if __name__ == '__main__':
     cwd = get_valid_cwd()
     add_virtual_env_segment(p, cwd)
     #p.append(Segment(p, ' \\u ', 250, 240))
-    #p.append(Segment(p, ' \\h ', 250, 238))
+    p.append(Segment(p, ' \\u@\\h ', 250, 238))
     add_cwd_segment(p, cwd, 5, args.cwd_only)
     add_repo_segment(p, cwd)
     add_root_indicator(p, args.prev_error)
