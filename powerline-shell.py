@@ -7,6 +7,8 @@ import sys
 import re
 import argparse
 
+uid = os.geteuid()
+
 
 def warn(msg):
     print '[powerline-bash] ', msg
@@ -18,18 +20,25 @@ class Color:
 
     PATH_BG = 237  # dark grey
     PATH_FG = 250  # light grey
+
     CWD_FG = 254  # nearly-white grey
+
     SEPARATOR_FG = 244
 
     REPO_CLEAN_BG = 148  # a light green color
     REPO_CLEAN_FG = 0  # black
-    REPO_DIRTY_BG = 161  # pink/red
+    REPO_DIRTY_BG = 202
     REPO_DIRTY_FG = 15  # white
 
     CMD_PASSED_BG = 236
     CMD_PASSED_FG = 15
-    CMD_FAILED_BG = 161
+    CMD_FAILED_BG = 196
     CMD_FAILED_FG = 15
+
+    CMD_PASSED_BG_ROOT = 236
+    CMD_PASSED_FG_ROOT = 203
+    CMD_FAILED_BG_ROOT = 196
+    CMD_FAILED_FG_ROOT = 203
 
     SVN_CHANGES_BG = 148
     SVN_CHANGES_FG = 22  # dark green
@@ -61,15 +70,15 @@ class Powerline:
     }
 
     root_indicators = {
-        'bash': ' \\$ ',
-        'zsh': ' \\$ ',
-        'bare': ' $ ',
+        'bash': {True: ' \\$ ', False: ' # '},
+        'zsh' : {True: ' \\$ ', False: ' # '},
+        'bare': {True: ' $ ',   False: ' # '},
     }
 
     def __init__(self, mode, shell):
         self.shell = shell
         self.color_template = self.color_templates[shell]
-        self.root_indicator = self.root_indicators[shell]
+        self.root_indicator = self.root_indicators[shell][bool(uid)]
         self.reset = self.color_template % '[0m'
         self.separator = Powerline.symbols[mode]['separator']
         self.separator_thin = Powerline.symbols[mode]['separator_thin']
@@ -116,6 +125,14 @@ class Segment:
             separator_bg,
             self.powerline.fgcolor(self.separator_fg),
             self.separator))
+
+
+def add_user_host_segment(powerline, cwd):
+
+    powerline.append(Segment(powerline, ' \\u',
+                     Color.CMD_PASSED_FG if uid else Color.CMD_PASSED_FG_ROOT,
+                     238, separator='@', separator_fg=81))
+    powerline.append(Segment(powerline, '\\h ', 87, 238))
 
 
 def add_cwd_segment(powerline, cwd, maxdepth, cwd_only=False):
@@ -294,11 +311,13 @@ def add_virtual_env_segment(powerline, cwd):
 
 
 def add_root_indicator(powerline, error):
-    bg = Color.CMD_PASSED_BG
-    fg = Color.CMD_PASSED_FG
+    fg = Color.CMD_PASSED_FG if uid else Color.CMD_PASSED_FG_ROOT
+    bg = Color.CMD_PASSED_BG if uid else Color.CMD_PASSED_BG_ROOT
+
     if int(error) != 0:
-        fg = Color.CMD_FAILED_FG
-        bg = Color.CMD_FAILED_BG
+        fg = Color.CMD_FAILED_FG if uid else Color.CMD_FAILED_FG_ROOT
+        bg = Color.CMD_FAILED_BG if uid else Color.CMD_FAILED_BG_ROOT
+
     powerline.append(Segment(powerline, powerline.root_indicator, fg, bg))
 
 
@@ -326,6 +345,7 @@ def get_valid_cwd():
         warn("Your current directory is invalid. Lowest valid directory: " + up)
     return cwd
 
+
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--cwd-only', action='store_true')
@@ -336,12 +356,13 @@ if __name__ == '__main__':
 
     p = Powerline(mode=args.mode, shell=args.shell)
     cwd = get_valid_cwd()
+
     add_virtual_env_segment(p, cwd)
-    #p.append(Segment(p, ' \\u ', 250, 240))
-    p.append(Segment(p, ' \\u@\\h ', 250, 238))
+    add_user_host_segment(p, cwd)
     add_cwd_segment(p, cwd, 5, args.cwd_only)
     add_repo_segment(p, cwd)
     add_root_indicator(p, args.prev_error)
+
     sys.stdout.write(p.draw())
 
 # vim: set expandtab:
