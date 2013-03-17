@@ -27,7 +27,7 @@ It retains the original features of the [original code](https://github.com/milkb
 I successfully tested it with:
 
 - [iTerm2](http://www.iterm2.com/) On OSX 10.8
-- [Terminator](https://launchpad.net/terminator) and [GNOME Terminal](https://help.gnome.org/users/gnome-terminal/stable/)) on Ubuntu 12.04 and 12.10
+- [Terminator](https://launchpad.net/terminator) and [GNOME Terminal](https://help.gnome.org/users/gnome-terminal/stable/) on Ubuntu 12.04 and 12.10
 
 It has small issues with:
 
