@@ -1,9 +1,9 @@
 Powerline style prompt for Bash (and now, ZSH)
 ==============================================
 
-A [Powerline](https://github.com/Lokaltog/vim-powerline) like prompt for Bash/ZSH:
+A powerline like prompt for Bash/ZSH:
 
-![MacVim+Solarized+Powerline+CtrlP](https://raw.github.com/milkbikis/dotfiles-mac/master/bash-powerline-screenshot.png)
+![Powerline+Capture+Terminal](https://raw.github.com/Karmak23/powerline-shell/powerline-screenshot.png)
 
 *  Shows some important details about the git branch:
     *  Displays the current git branch which changes background color when the branch is dirty
@@ -22,18 +22,12 @@ A [Powerline](https://github.com/Lokaltog/vim-powerline) like prompt for Bash/ZS
 
 * Clone this repository somewhere:
 
-        git clone https://github.com/milkbikis/powerline-shell
-
-* Create a symlink to the python script in your home:
-
-        ln -s <path/to/powerline-shell.py> ~/powerline-shell.py
-
-  If you don't want the symlink, just modify the path in the commands below
+        git clone https://github.com/Karmak23/powerline-shell
 
 * Now add the following to your .bashrc:
 
         function _update_ps1() {
-           export PS1="$(~/powerline-shell.py $?)"
+           export PS1="$(~/path/to/powerline-shell.py $?)"
         }
 
         export PROMPT_COMMAND="_update_ps1"
@@ -41,7 +35,7 @@ A [Powerline](https://github.com/Lokaltog/vim-powerline) like prompt for Bash/ZS
 * ZSH fans, add the following to your .zshrc:
 
         function powerline_precmd() {
-          export PS1="$(~/powerline-shell.py $? --shell zsh)"
+          export PS1="$(~/path/to/powerline-shell.py $? --shell zsh)"
         }
 
         function install_powerline_precmd() {
@@ -58,5 +52,5 @@ A [Powerline](https://github.com/Lokaltog/vim-powerline) like prompt for Bash/ZS
 * Fish users, redefine `fish_prompt` in ~/.config/fish/config.fish:
 
         function fish_prompt
-            ~/powerline-shell.py $status --shell bare
+            ~/path/to/powerline-shell.py $status --shell bare
         end
