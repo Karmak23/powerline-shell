@@ -3,7 +3,7 @@ Powerline style prompt for Bash (and now, ZSH)
 
 A powerline like prompt for Bash/ZSH:
 
-![Powerline+Capture+Terminal](https://raw.github.com/Karmak23/powerline-shell/powerline-screenshot.png)
+![Powerline+Capture+Terminal](https://raw.github.com/Karmak23/powerline-shell/master/powerline-screenshot.png)
 
 *  Shows some important details about the git branch:
     *  Displays the current git branch which changes background color when the branch is dirty
