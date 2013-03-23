@@ -149,7 +149,7 @@ def add_cwd_segment(powerline, cwd, maxdepth, cwd_only=False):
 
     names = cwd.split('/')
     if len(names) > maxdepth:
-        names = names[:2] + [u'\u2026'] + names[2 - maxdepth:]
+        names = names[:1] + [u'\u2026'] + names[1 - maxdepth:]
 
     if not cwd_only:
         for n in names[:-1]:
