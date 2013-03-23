@@ -359,7 +359,7 @@ if __name__ == '__main__':
 
     add_virtual_env_segment(p, cwd)
     add_user_host_segment(p, cwd)
-    add_cwd_segment(p, cwd, 5, args.cwd_only)
+    add_cwd_segment(p, cwd, 3, args.cwd_only)
     add_repo_segment(p, cwd)
     add_root_indicator(p, args.prev_error)
 
