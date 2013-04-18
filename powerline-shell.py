@@ -11,7 +11,7 @@ uid = os.geteuid()
 
 
 def warn(msg):
-    print '[powerline-bash] ', msg
+    print('[powerline-bash] ', msg)
 
 
 class Color:
@@ -98,8 +98,15 @@ class Powerline:
 
     def draw(self):
         shifted = self.segments[1:] + [None]
-        return (''.join((c.draw(n) for c, n in zip(self.segments, shifted)))
-                + self.reset).encode('utf-8')
+
+        final = (''.join((c.draw(n) for c, n in zip(self.segments, shifted)))
+                 + self.reset)
+
+        if sys.version_info[0] <= 2:
+            return final.encode('utf-8')
+
+        else:
+            return final
 
 
 class Segment:
@@ -139,7 +146,9 @@ def add_cwd_segment(powerline, cwd, maxdepth, cwd_only=False):
     #powerline.append(' \\w ', 15, 237)
     home = os.getenv('HOME')
     cwd = cwd or os.getenv('PWD')
-    cwd = cwd.decode('utf-8')
+
+    if sys.version_info[0] <= 2:
+        cwd = cwd.decode('utf-8')
 
     if cwd.find(home) == 0:
         cwd = cwd.replace(home, '~', 1)
