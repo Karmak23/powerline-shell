@@ -214,31 +214,31 @@ def get_git_status():
 
     if sys.version_info[0] <= 2:
         output = subprocess.Popen(['git', 'status', '--ignore-submodules'],
-                                  stdout=subprocess.PIPE).stdout
+                                  stdout=subprocess.PIPE).stdout.read()
 
     else:
         output = subprocess.Popen(['git', 'status', '--ignore-submodules'],
                                   stdout=subprocess.PIPE,
                                   universal_newlines=True).stdout.read()
 
-        for line in output.split('\n'):
-            origin_status = re.findall(
-                    r"Your branch is (ahead|behind).*?(\d+) comm", line)
+    for line in output.split('\n'):
+        origin_status = re.findall(
+                r"Your branch is (ahead|behind).*?(\d+) comm", line)
 
-            if origin_status:
-                origin_position = " %d" % int(origin_status[0][1])
+        if origin_status:
+            origin_position = " %d" % int(origin_status[0][1])
 
-                if origin_status[0][0] == 'behind':
-                    origin_position += u'\u21E3'
+            if origin_status[0][0] == 'behind':
+                origin_position += u'\u21E3'
 
-                if origin_status[0][0] == 'ahead':
-                    origin_position += u'\u21E1'
+            if origin_status[0][0] == 'ahead':
+                origin_position += u'\u21E1'
 
-            if line.find('nothing to commit') >= 0:
-                has_pending_commits = False
+        if 'nothing to commit' in line:
+            has_pending_commits = False
 
-            if line.find('Untracked files') >= 0:
-                has_untracked_files = True
+        if 'Untracked files' in line:
+            has_untracked_files = True
 
     return has_pending_commits, has_untracked_files, origin_position
 
