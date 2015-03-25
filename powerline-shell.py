@@ -11,7 +11,7 @@ uid = os.geteuid()
 
 
 def warn(msg):
-    print('[powerline-bash] ', msg)
+    print('[powerline-shell] ', msg)
 
 
 class Color:
@@ -143,7 +143,7 @@ def add_user_host_segment(powerline, cwd):
 
 
 def add_cwd_segment(powerline, cwd, maxdepth, cwd_only=False):
-    #powerline.append(' \\w ', 15, 237)
+    # powerline.append(' \\w ', 15, 237)
     home = os.getenv('HOME')
     cwd = cwd or os.getenv('PWD')
 
@@ -212,18 +212,23 @@ def get_git_status():
     has_untracked_files = False
     origin_position = ''
 
+    # Be sure git talks to us in english,
+    # else a lot of information gets lost.
+    env = os.environ.copy()
+    env['LANG'] = 'C'
+
     if sys.version_info[0] <= 2:
         output = subprocess.Popen(['git', 'status', '--ignore-submodules'],
-                                  stdout=subprocess.PIPE).stdout.read()
+                                  stdout=subprocess.PIPE, env=env).stdout.read()
 
     else:
         output = subprocess.Popen(['git', 'status', '--ignore-submodules'],
-                                  stdout=subprocess.PIPE,
+                                  stdout=subprocess.PIPE, env=env,
                                   universal_newlines=True).stdout.read()
 
     for line in output.split('\n'):
         origin_status = re.findall(
-                r"Your branch is (ahead|behind).*?(\d+) comm", line)
+            r"Your branch is (ahead|behind).*?(\d+) comm", line)
 
         if origin_status:
             origin_position = " %d" % int(origin_status[0][1])
@@ -244,7 +249,7 @@ def get_git_status():
 
 
 def add_git_segment(powerline, cwd):
-    #cmd = "git branch 2> /dev/null | grep -e '\\*'"
+    # cmd = "git branch 2> /dev/null | grep -e '\\*'"
 
     if sys.version_info[0] <= 2:
         kw = {}
@@ -252,12 +257,20 @@ def add_git_segment(powerline, cwd):
     else:
         kw = {'universal_newlines': True}
 
+    # Be sure git talks to us in english,
+    # else a lot of information gets lost.
+    env = os.environ.copy()
+    env['LANG'] = 'C'
+
     p1 = subprocess.Popen(['git', 'branch'],
                           stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE)
+                          stderr=subprocess.PIPE,
+                          env=env)
     p2 = subprocess.Popen(['grep', '-e', '\\*'],
                           stdin=p1.stdout,
-                          stdout=subprocess.PIPE, **kw)
+                          stdout=subprocess.PIPE,
+                          env=env,
+                          **kw)
 
     output = p2.communicate()[0].strip()
 
@@ -306,9 +319,9 @@ def add_svn_segment(powerline, cwd):
         '!' item is missing (removed by non-svn command) or incomplete
          '~' versioned item obstructed by some item of a different kind
     '''
-    #TODO: Color segment based on above status codes
+    # TODO: Color segment based on above status codes
     try:
-        #cmd = '"svn status | grep -c "^[ACDIMRX\\!\\~]"'
+        # cmd = '"svn status | grep -c "^[ACDIMRX\\!\\~]"'
         p1 = subprocess.Popen(['svn', 'status'], stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE)
         p2 = subprocess.Popen(['grep', '-c', '^[ACDIMR\\!\\~]'],
